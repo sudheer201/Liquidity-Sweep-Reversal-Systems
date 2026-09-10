@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Liquidity Sweep — Live Dashboard</title>
+<style>
+  body {
+    margin: 0;
+    background: #0d0d0d;
+    font-family: -apple-system, Segoe UI, sans-serif;
+    color: #eee;
+    padding: 16px;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: #fff;
+  }
+  #subtitle {
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 10px 14px;
+    background: #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+  .card-title {
+    font-weight: 600;
+    color: #fff;
+  }
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3ecf8e;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  .card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #fff;
+  }
+  .missing {
+    padding: 60px 20px;
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+  }
+  #lastRefresh {
+    color: #666;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Liquidity Sweep Reversal System — Live Dashboard</h1>
+<div id="subtitle">Auto-refreshing every 5 seconds &nbsp;|&nbsp; Last refresh: <span id="lastRefresh">-</span></div>
+
+<div id="grid">
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title"><span class="status-dot"></span>AAPL (stocks)</span>
+    </div>
+    <img id="img-aapl" src="live_AAPL.png" onerror="this.style.display='none'; document.getElementById('missing-aapl').style.display='block'">
+    <div id="missing-aapl" class="missing" style="display:none">No chart yet — run: python live_trading.py --ticker AAPL</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title"><span class="status-dot"></span>BTC/USD (crypto)</span>
+    </div>
+    <img id="img-btc" src="live_BTCUSD.png" onerror="this.style.display='none'; document.getElementById('missing-btc').style.display='block'">
+    <div id="missing-btc" class="missing" style="display:none">No chart yet — run: python live_trading_crypto.py --symbol BTC/USD</div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title"><span class="status-dot"></span>ETH/USD (crypto)</span>
+    </div>
+    <img id="img-eth" src="live_ETHUSD.png" onerror="this.style.display='none'; document.getElementById('missing-eth').style.display='block'">
+    <div id="missing-eth" class="missing" style="display:none">No chart yet — run: python live_trading_crypto.py --symbol ETH/USD</div>
+  </div>
+</div>
+
+<script>
+  const ids = ["img-aapl", "img-btc", "img-eth"];
+
+  function refreshAll() {
+    ids.forEach(id => {
+      const img = document.getElementById(id);
+      const baseSrc = img.src.split("?")[0];
+      // on error, show the "missing" placeholder instead of a broken image icon
+      img.onerror = () => {
+        img.style.display = "none";
+        const missing = document.getElementById(id.replace("img-", "missing-"));
+        if (missing) missing.style.display = "block";
+      };
+      img.onload = () => {
+        img.style.display = "block";
+        const missing = document.getElementById(id.replace("img-", "missing-"));
+        if (missing) missing.style.display = "none";
+      };
+      img.src = baseSrc + "?t=" + new Date().getTime();
+    });
+    document.getElementById("lastRefresh").textContent = new Date().toLocaleTimeString();
+  }
+
+  refreshAll();
+  setInterval(refreshAll, 5000);
+</script>
+
+</body>
+</html>
