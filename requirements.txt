@@ -1,0 +1,7 @@
+﻿pandas>=1.5
+numpy>=1.23
+matplotlib>=3.6
+yfinance>=0.2
+huggingface_hub>=0.20
+pyarrow>=14
+alpaca-py>=0.30
